@@ -3,6 +3,7 @@
   python3,
   fetchFromGitHub,
   installShellFiles,
+  writableTmpDirAsHomeHook,
 }:
 
 python3.pkgs.buildPythonApplication (finalAttrs: {
@@ -61,6 +62,7 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
 
   nativeCheckInputs = with python3.pkgs; [
     pytestCheckHook
+    writableTmpDirAsHomeHook # for cache generation.
   ];
 
   disabledTests = [
@@ -85,8 +87,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     "tests/test_docs.py"
   ];
 
-  HOME = "$TMPDIR"; # for cache generation.
-
   # Necessary because it confuse the tests when it does "from ripe.atlas.sagan import X"
   # version.py is used by Sphinx tests.
   preCheck = ''
@@ -100,6 +100,6 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     homepage = "https://github.com/RIPE-NCC/ripe-atlas-tools";
     changelog = "https://github.com/RIPE-NCC/ripe-atlas-tools/blob/v${finalAttrs.version}/CHANGES.rst";
     license = lib.licenses.gpl3Only;
-    maintainers = with lib.maintainers; [ raitobezarius ];
+    maintainers = [ ];
   };
 })

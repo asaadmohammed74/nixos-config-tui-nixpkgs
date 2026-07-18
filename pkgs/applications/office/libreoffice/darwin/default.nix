@@ -9,21 +9,14 @@
 let
   appName = "LibreOffice.app";
   scriptName = "soffice";
-  version = "25.2.1";
+  version = "26.2.4";
 
   dist = {
     aarch64-darwin = rec {
       arch = "aarch64";
       archSuffix = arch;
       url = "https://download.documentfoundation.org/libreoffice/stable/${version}/mac/${arch}/LibreOffice_${version}_MacOS_${archSuffix}.dmg";
-      sha256 = "d0f8573dfc5d1a858061a9bc7889313cb6837db8a8f1b568d067ca156c03745e";
-    };
-
-    x86_64-darwin = rec {
-      arch = "x86_64";
-      archSuffix = "x86-64";
-      url = "https://download.documentfoundation.org/libreoffice/stable/${version}/mac/${arch}/LibreOffice_${version}_MacOS_${archSuffix}.dmg";
-      sha256 = "88746b5e46a72ae964ed2275399ee0fb2a0712f6d93a30b151358ffa0ea8349a";
+      sha256 = "64e0ad05564554eeee639d49b08b20908a38d4722ec95f1620d05c99bcbe9fb1";
     };
   };
 in
@@ -78,7 +71,6 @@ stdenvNoCC.mkDerivation {
     maintainers = with lib.maintainers; [ tricktron ];
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     platforms = [
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
   };

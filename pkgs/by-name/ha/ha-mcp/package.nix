@@ -2,23 +2,26 @@
   lib,
   python3Packages,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 python3Packages.buildPythonApplication (finalAttrs: {
   pname = "ha-mcp";
-  version = "6.6.1";
+  version = "7.8.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "homeassistant-ai";
     repo = "ha-mcp";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-yAJbvfIH5ewRTip8whbOKxE479qAihESaiLFTnhpRkY=";
+    hash = "sha256-+HhtHeSQlK1jd/4/x1d54Etvrs8e+pQkIGvJV39ZZBw=";
   };
 
   build-system = with python3Packages; [
     setuptools
   ];
+
+  pythonRelaxDeps = true;
 
   dependencies =
     with python3Packages;
@@ -26,8 +29,8 @@ python3Packages.buildPythonApplication (finalAttrs: {
       cryptography
       fastmcp
       httpx
-      jq
       pydantic
+      pydantic-monty
       python-dotenv
       truststore
       websockets
@@ -36,6 +39,13 @@ python3Packages.buildPythonApplication (finalAttrs: {
 
   # Tests require a running Home Assistant instance
   doCheck = false;
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--use-github-releases"
+      "--version-regex=^v([0-9]+\\.[0-9]+\\.[0-9]+)$"
+    ];
+  };
 
   pythonImportsCheck = [ "ha_mcp" ];
 

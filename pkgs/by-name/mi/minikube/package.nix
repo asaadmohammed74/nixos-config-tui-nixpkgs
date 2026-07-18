@@ -10,22 +10,26 @@
   withQemu ? false,
   qemu,
   makeWrapper,
+  writableTmpDirAsHomeHook,
   OVMF,
+  versionCheckHook,
 }:
 
 buildGoModule (finalAttrs: {
   pname = "minikube";
-  version = "1.38.0";
+  version = "1.38.1";
 
-  vendorHash = "sha256-Sm/c5NhoLyd7+GFpOw6wyZNqEnJyREHgZf33U7g1LuE=";
+  __structuredAttrs = true;
+
+  vendorHash = "sha256-Oy8cM/foZKC83PxqkJW+o8vVYJhszKxXs9l2eks7FN4=";
 
   doCheck = false;
 
   src = fetchFromGitHub {
     owner = "kubernetes";
     repo = "minikube";
-    rev = "v${finalAttrs.version}";
-    sha256 = "sha256-6kBygQ9agBcFJZxoiGb4KsPMz/jnZU54sGMWjF3mTuA=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-1unwbu2pJviHXukQKalJLgrkHpjf0sRR2nCm2gKv2VU=";
   };
   postPatch = ''
     substituteInPlace Makefile \
@@ -49,25 +53,42 @@ buildGoModule (finalAttrs: {
     pkg-config
     which
     makeWrapper
+    writableTmpDirAsHomeHook
   ];
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libvirt ];
 
   buildPhase = ''
+    runHook preBuild
+
     make COMMIT=${finalAttrs.src.rev}
+
+    runHook postBuild
   '';
 
   installPhase = ''
-    install out/minikube -Dt $out/bin
+    runHook preInstall
+
+    installBin out/minikube
 
     wrapProgram $out/bin/minikube --set MINIKUBE_WANTUPDATENOTIFICATION false
-    export HOME=$PWD
+    ln -sv $out/bin/minikube $out/bin/kubectl
 
     for shell in bash zsh fish; do
       $out/bin/minikube completion $shell > minikube.$shell
       installShellCompletion minikube.$shell
     done
+
+    runHook postInstall
   '';
+
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    writableTmpDirAsHomeHook
+  ];
+  versionCheckKeepEnvironment = [ "HOME" ];
+  versionCheckProgramArg = "version";
+  doInstallCheck = true;
 
   meta = {
     homepage = "https://minikube.sigs.k8s.io";

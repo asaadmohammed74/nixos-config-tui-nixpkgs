@@ -19,13 +19,13 @@
 
 assert withConplay -> !libOnly;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "${lib.optionalString libOnly "lib"}mpg123";
-  version = "1.33.4";
+  version = "1.33.5";
 
   src = fetchurl {
-    url = "mirror://sourceforge/mpg123/mpg123-${version}.tar.bz2";
-    hash = "sha256-OujJ/4Cpe/wOIuifvNdGh+yk/B2zFbEmB/J/ActaR9k=";
+    url = "mirror://sourceforge/mpg123/mpg123-${finalAttrs.version}.tar.bz2";
+    hash = "sha256-DX68jaCv88o4PIxrWmrb5ALuW7JWaFuMVJnzpzn51t0=";
   };
 
   outputs = [
@@ -88,7 +88,7 @@ stdenv.mkDerivation rec {
       # Expect the text in format of '<a href="download/mpg123-1.32.6.tar.bz2">'
       new_version="$(curl -s https://mpg123.org/download.shtml |
           pcregrep -o1 '<a href="download/mpg123-([0-9.]+).tar.bz2">')"
-      update-source-version ${pname} "$new_version"
+      update-source-version ${finalAttrs.pname} "$new_version"
     '';
   };
 
@@ -96,7 +96,7 @@ stdenv.mkDerivation rec {
     description = "Fast console MPEG Audio Player and decoder library";
     homepage = "https://mpg123.org";
     license = lib.licenses.lgpl21Only;
-    maintainers = with lib.maintainers; [ ftrvxmtrx ];
+    maintainers = [ ];
     platforms = lib.platforms.all;
   };
-}
+})

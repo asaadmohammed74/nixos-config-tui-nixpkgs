@@ -1,7 +1,6 @@
 {
   lib,
   buildPythonPackage,
-  pythonOlder,
   isPyPy,
   distlib,
   fetchFromGitHub,
@@ -13,19 +12,20 @@
   pytest-freezer,
   pytest-mock,
   pytestCheckHook,
+  python-discovery,
   time-machine,
 }:
 
 buildPythonPackage rec {
   pname = "virtualenv";
-  version = "20.36.1";
+  version = "21.2.4";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pypa";
     repo = "virtualenv";
     tag = version;
-    hash = "sha256-8fiC7+9FzQnmoI+N4cA5kKBLH9tpU7LXZ7pVj8Bz8Wc=";
+    hash = "sha256-3Ed2h5zzjpm+D1fQW2urWYcO/6sFGuZtueQxUnIu3MY=";
   };
 
   build-system = [
@@ -37,6 +37,7 @@ buildPythonPackage rec {
     distlib
     filelock
     platformdirs
+    python-discovery
   ];
 
   nativeCheckInputs = [
@@ -57,7 +58,6 @@ buildPythonPackage rec {
     # Network access
     "test_seed_link_via_app_data"
   ]
-  ++ lib.optionals (pythonOlder "3.11") [ "test_help" ]
   ++ lib.optionals isPyPy [
     # encoding problems
     "test_bash"

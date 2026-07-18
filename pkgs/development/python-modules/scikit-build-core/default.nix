@@ -2,7 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  pythonOlder,
+  fetchpatch,
 
   # build-system
   hatch-vcs,
@@ -13,7 +13,6 @@
   # dependencies
   packaging,
   pathspec,
-  exceptiongroup,
 
   # tests
   build,
@@ -23,27 +22,29 @@
   pytest-subprocess,
   pytestCheckHook,
   setuptools,
-  tomli,
   virtualenv,
   wheel,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "scikit-build-core";
-  version = "0.11.5";
+  version = "0.12.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "scikit-build";
     repo = "scikit-build-core";
-    tag = "v${version}";
-    hash = "sha256-4DwODJw1U/0+K/d7znYtDO2va71lzp1gDm4Bg9OBjQY=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-JE6z44u1FLfI+Gguhd2rVUvY8tyEoo/WviGJmPRT8kc=";
   };
 
-  postPatch = lib.optionalString (pythonOlder "3.11") ''
-    substituteInPlace pyproject.toml \
-      --replace-fail '"error",' '"error", "ignore::UserWarning",'
-  '';
+  patches = [
+    (fetchpatch {
+      name = "setuptools-scm-10-compat.patch";
+      url = "https://github.com/scikit-build/scikit-build-core/commit/1b870c538bf7ca679fc4a6e0cbba301c98d9ac35.patch";
+      hash = "sha256-JUxBvKiAHpDlIIFkvU+CflTNA6m/auxW5wd5cVYpvcM=";
+    })
+  ];
 
   build-system = [
     hatch-vcs
@@ -53,10 +54,6 @@ buildPythonPackage rec {
   dependencies = [
     packaging
     pathspec
-  ]
-  ++ lib.optionals (pythonOlder "3.11") [
-    exceptiongroup
-    tomli
   ];
 
   nativeCheckInputs = [
@@ -84,6 +81,11 @@ buildPythonPackage rec {
     "network"
   ];
 
+  disabledTests = [
+    # wheel tags generated with wrong system name/version
+    "test_wheel_tag"
+  ];
+
   disabledTestPaths = [
     # store permissions issue in Nix:
     "tests/test_editable.py"
@@ -94,8 +96,8 @@ buildPythonPackage rec {
   meta = {
     description = "Next generation Python CMake adaptor and Python API for plugins";
     homepage = "https://github.com/scikit-build/scikit-build-core";
-    changelog = "https://github.com/scikit-build/scikit-build-core/blob/${src.tag}/docs/about/changelog.md";
+    changelog = "https://github.com/scikit-build/scikit-build-core/blob/${finalAttrs.src.tag}/docs/about/changelog.md";
     license = with lib.licenses; [ asl20 ];
     maintainers = with lib.maintainers; [ veprbl ];
   };
-}
+})

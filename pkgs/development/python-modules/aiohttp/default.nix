@@ -4,7 +4,6 @@
   buildPythonPackage,
   fetchFromGitHub,
   replaceVars,
-  isPy310,
   isPyPy,
   pythonOlder,
 
@@ -42,6 +41,7 @@
   pytest-codspeed,
   pytest-cov-stub,
   pytest-mock,
+  pytest-timeout,
   pytest-xdist,
   pytestCheckHook,
   re-assert,
@@ -49,16 +49,16 @@
   zlib-ng,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "aiohttp";
-  version = "3.13.3";
+  version = "3.14.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "aio-libs";
     repo = "aiohttp";
-    tag = "v${version}";
-    hash = "sha256-V+digrfigdA3hwd2xW47BACh3r07j6pGE8WFAGivZnA=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-OJSLv/NfVrKESZqNr51FJUzLRz7wLMRdGoNjKC5EhlI=";
   };
 
   postPatch = ''
@@ -69,6 +69,10 @@ buildPythonPackage rec {
     # don't install Cython using pip
     substituteInPlace Makefile \
       --replace-fail "cythonize: .install-cython" "cythonize:"
+
+    # don't depend on coverage for tests
+    substituteInPlace setup.cfg \
+      --replace-fail "ignore:Couldn't import C tracer:coverage.exceptions.CoverageWarning" ""
   '';
 
   build-system = [
@@ -96,10 +100,7 @@ buildPythonPackage rec {
     propcache
     yarl
   ]
-  ++ lib.optionals (pythonOlder "3.11") [
-    async-timeout
-  ]
-  ++ optional-dependencies.speedups;
+  ++ finalAttrs.passthru.optional-dependencies.speedups;
 
   optional-dependencies.speedups = [
     aiodns
@@ -119,6 +120,7 @@ buildPythonPackage rec {
     pytest-codspeed
     pytest-cov-stub
     pytest-mock
+    pytest-timeout
     pytest-xdist
     pytestCheckHook
     re-assert
@@ -136,15 +138,15 @@ buildPythonPackage rec {
     "test_invalid_idna"
     # don't run benchmarks
     "test_import_time"
+    "test_cookie_pattern_performance"
+    "test_forwarded_re_performance"
+    "test_regex_performance"
     # racy
     "test_uvloop_secure_https_proxy"
     # Cannot connect to host example.com:443 ssl:default [Could not contact DNS servers]
     "test_tcp_connector_ssl_shutdown_timeout_passed_to_create_connection"
-  ]
-  # these tests fail with python310 but succeeds with 11+
-  ++ lib.optionals isPy310 [
-    "test_https_proxy_unsupported_tls_in_tls"
-    "test_tcp_connector_raise_connector_ssl_error"
+    # Fails with http.cookies.CookieError: Control characters are not allowed in cookies
+    "test_parse_set_cookie_headers_uses_unquote_with_octal"
   ]
   ++ lib.optionals stdenv.hostPlatform.is32bit [ "test_cookiejar" ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
@@ -167,10 +169,10 @@ buildPythonPackage rec {
   '';
 
   meta = {
-    changelog = "https://docs.aiohttp.org/en/${src.tag}/changes.html";
+    changelog = "https://docs.aiohttp.org/en/${finalAttrs.src.tag}/changes.html";
     description = "Asynchronous HTTP Client/Server for Python and asyncio";
     license = lib.licenses.asl20;
     homepage = "https://github.com/aio-libs/aiohttp";
     maintainers = with lib.maintainers; [ dotlambda ];
   };
-}
+})

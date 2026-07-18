@@ -15,7 +15,6 @@ let
   plat =
     {
       x86_64-linux = "linux-x64";
-      x86_64-darwin = "darwin-x64";
       aarch64-linux = "linux-arm64";
       aarch64-darwin = "darwin-arm64";
       armv7l-linux = "linux-armhf";
@@ -27,12 +26,11 @@ let
 
   hash =
     {
-      x86_64-linux = "sha256-lBCwKNJv9iNQyuEvg+Ht4haFZG/lozm2KgCguKYIwYI=";
-      x86_64-darwin = "sha256-29oFrRfdxcMkzppYkQDkKP0DmnzjwbSciKvGwDhf8q0=";
-      aarch64-linux = "sha256-53t+UvvECTANRzHnyMbmff7aS5cocpRC8QaSkLRQcLw=";
-      aarch64-darwin = "sha256-fIp2NH2AtpQ3KXFXvDFIw4Jx2QlXnwHE4WskJ0bLwNE=";
-      armv7l-linux = "sha256-+y4b1/2C2YTmF2kc16xvzM8MzU64OxMK9xEORwkfBWw=";
-      loongarch64-linux = "sha256-VKzGJytrcMjXihWIM/qjLeZzXHb/xxHnftnXQn8erfA=";
+      x86_64-linux = "sha256-LJsGc11MH6zlcJNfSWjTWPn2Jp9dkjeBPQuCXH1woUM=";
+      aarch64-linux = "sha256-mT5dvw8GOZ0GnZaKRS/TAzQDEEYDOgcj6w6lNLy5kQ0=";
+      aarch64-darwin = "sha256-c8K17XKpRG1ji2mUfoyg2+cRF+qc1KVMYVkaQoUIz7Y=";
+      armv7l-linux = "sha256-91ZHhEUDVoDiRBLwMHVLhzKmb9gWcPBUsVRZVLhCA4M=";
+      loongarch64-linux = "sha256-7iUdsIyJkIi40Xn+/PWdCVgahQxbZtiMw0QLMisN+sg=";
     }
     .${system} or throwSystem;
 
@@ -43,7 +41,8 @@ buildVscode rec {
 
   # Please backport all compatible updates to the stable release.
   # This is important for the extension ecosystem.
-  version = "1.108.20787";
+  version = "1.121.03429";
+  vscodeVersion = "1.121.0";
   pname = "vscodium";
 
   executableName = "codium";
@@ -55,7 +54,7 @@ buildVscode rec {
     inherit hash;
   };
 
-  tests = nixosTests.vscodium;
+  tests = nixosTests.vscodium.xorg;
 
   updateScript = ./update-vscodium.sh;
 
@@ -78,16 +77,15 @@ buildVscode rec {
     '';
     homepage = "https://github.com/VSCodium/vscodium";
     downloadPage = "https://github.com/VSCodium/vscodium/releases";
+    changelog = "https://github.com/VSCodium/vscodium/releases/tag/${version}";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with lib.maintainers; [
-      synthetica
       bobby285271
     ];
     mainProgram = "codium";
     platforms = [
       "x86_64-linux"
-      "x86_64-darwin"
       "aarch64-linux"
       "aarch64-darwin"
       "armv7l-linux"

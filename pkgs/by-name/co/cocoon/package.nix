@@ -2,17 +2,19 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  nixosTests,
+  stdenvNoCC,
   nix-update-script,
 }:
 buildGoModule (finalAttrs: {
   pname = "cocoon";
-  version = "0.8.4";
+  version = "0.10";
 
   src = fetchFromGitHub {
     owner = "haileyok";
     repo = "cocoon";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-xXXHJcI3icsCeOeI+6L/waK3+UtjhBZosQPLoGN1TiY=";
+    hash = "sha256-SvLXtn4Nr8zcvvjGarNLYeKqyniI6eg50cnqV6Q+3/s=";
   };
 
   ldflags = [
@@ -21,9 +23,12 @@ buildGoModule (finalAttrs: {
     "-X main.Version=${finalAttrs.version}"
   ];
 
-  vendorHash = "sha256-bux3OfHT8f1FVpBAZUP23vo8M6h8nPTJbi/GTUzhdc4=";
+  vendorHash = "sha256-Vkf5XyJA/Vdufa1OpCzgIGSQa5pVsFCTfaAVI7l947E=";
 
-  passthru.updateScript = nix-update-script { };
+  passthru = {
+    tests = lib.optionalAttrs stdenvNoCC.hostPlatform.isLinux { inherit (nixosTests) cocoon; };
+    updateScript = nix-update-script { };
+  };
 
   meta = {
     description = "ATProtocol Personal Data Server written in Go with a SQLite block and blob store";

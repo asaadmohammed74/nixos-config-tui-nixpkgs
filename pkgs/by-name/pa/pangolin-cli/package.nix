@@ -10,18 +10,20 @@
 
 buildGoModule (finalAttrs: {
   pname = "pangolin-cli";
-  version = "0.2.0";
+  version = "0.13.0";
 
   src = fetchFromGitHub {
     owner = "fosrl";
     repo = "cli";
     tag = finalAttrs.version;
-    hash = "sha256-NR8GaOtFjOk6LLTdtDw6Nu691B76bPwllA2EOPSaM94=";
+    hash = "sha256-wJS60bG5eQIEsDdqKxfSVKPaW+EmmtiaW9gbH1wwBQ4=";
   };
 
-  patches = [ ./use-tagged-newt-and-olm.patch ];
+  ldflags = [
+    "-X github.com/fosrl/cli/internal/version.Version=${finalAttrs.version}"
+  ];
 
-  vendorHash = "sha256-7LPnmbrIgWV5p4KCHfVVljRvadtZfg2FwLWIE/m3pi4=";
+  vendorHash = "sha256-yHU/xfO+I5YncycGkPkpKGUM11YyMrAkS17N/nAmUc0=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -49,6 +51,7 @@ buildGoModule (finalAttrs: {
     license = lib.licenses.agpl3Only;
     maintainers = with lib.maintainers; [
       water-sucks
+      jackr
     ];
     mainProgram = "pangolin";
   };

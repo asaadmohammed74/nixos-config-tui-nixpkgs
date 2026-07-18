@@ -7,16 +7,16 @@
 
 buildGoModule (finalAttrs: {
   pname = "algia";
-  version = "0.0.102";
+  version = "0.0.131";
 
   src = fetchFromGitHub {
     owner = "mattn";
     repo = "algia";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-vpZL4UNDtcJRsBA0th6/YccE/3GG7kzHrgJ3RWpgSk8=";
+    hash = "sha256-ywpaMeJ7vyf4uwoUHyZf7kK3/em7vj86AvfdC2T/UwQ=";
   };
 
-  vendorHash = "sha256-JTTWVs0KwceiLy6tpyd48zORiXLc18zwgG1c+ceivKU=";
+  vendorHash = "sha256-mim8EImPFHF2vf1vCi9jgECbVAOB32oXxsPMgUwYDBA=";
 
   meta = {
     description = "CLI application for nostr";

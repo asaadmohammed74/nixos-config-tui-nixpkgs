@@ -7,13 +7,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "cmark";
-  version = "0.31.1";
+  version = "0.31.2";
 
   src = fetchFromGitHub {
     owner = "commonmark";
     repo = "cmark";
     rev = finalAttrs.version;
-    sha256 = "sha256-+JLw7zCjjozjq1RhRQGFqHj/MTUTq3t7A0V3T2U2PQk=";
+    sha256 = "sha256-d7oL7qWUcuEzTAp61iJMvX0VvcoYpHJw2w5UmODmLdo=";
   };
 
   nativeBuildInputs = [ cmake ];
@@ -39,7 +39,7 @@ stdenv.mkDerivation (finalAttrs: {
     mainProgram = "cmark";
     homepage = "https://github.com/commonmark/cmark";
     changelog = "https://github.com/commonmark/cmark/raw/${finalAttrs.version}/changelog.txt";
-    maintainers = [ lib.maintainers.michelk ];
+    maintainers = [ ];
     platforms = lib.platforms.all;
     license = lib.licenses.bsd2;
   };

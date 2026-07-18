@@ -3,7 +3,6 @@
   stdenv,
   fetchurl,
   unzip,
-  bintools,
   versionCheckHook,
   runCommand,
   cctools,
@@ -12,7 +11,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "dart";
-  version = "3.10.9";
+  version = "3.12.2";
 
   src =
     let
@@ -22,14 +21,12 @@ stdenv.mkDerivation (finalAttrs: {
       system = selectSystem {
         x86_64-linux = "linux-x64";
         aarch64-linux = "linux-arm64";
-        x86_64-darwin = "macos-x64";
         aarch64-darwin = "macos-arm64";
       };
       hash = selectSystem {
-        x86_64-linux = "sha256-1DudOiG4LvKjfTGUW5nmuI9fjcROwZG0c/1inXjQuZQ=";
-        aarch64-linux = "sha256-Z8mPnmppTtPLNiY0Ny1pRzBAs3EoNtQsr82zxWwKBOs=";
-        x86_64-darwin = "sha256-pd37vWDOIKGdek/CuUSH7sVyiKqlLOW6GLT4IkzkwYA=";
-        aarch64-darwin = "sha256-99gMhvkzSJmYEsGuD3kBN1e3l685Xyy6cNICegC+Vk4=";
+        x86_64-linux = "sha256-KOR7RM8HXzZ3EEbAaLsNF0IBz5x2CHRK7RzCMgQpnC0=";
+        aarch64-linux = "sha256-+CyD7OfRaAR1UN/UpmTkBxrHxIi923LcQxAsItfgtRg=";
+        aarch64-darwin = "sha256-zYdTko53trZlvXDc4OZLTsbS4v3hQdZAm7cWyKwfHAo=";
       };
     in
     fetchurl {
@@ -48,7 +45,12 @@ stdenv.mkDerivation (finalAttrs: {
     cp -R . $out
   ''
   + lib.optionalString (stdenv.hostPlatform.isLinux) ''
-    find $out/bin -executable -type f -exec patchelf --set-interpreter ${bintools.dynamicLinker} {} \;
+    find $out/bin -type f -executable | while read f; do
+      if patchelf --print-interpreter "$f" >/dev/null 2>&1; then
+        patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
+                 --set-rpath "${lib.makeLibraryPath [ (lib.getLib stdenv.cc.cc) ]}" "$f"
+      fi
+    done
   ''
   + ''
     runHook postInstall
@@ -109,7 +111,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];

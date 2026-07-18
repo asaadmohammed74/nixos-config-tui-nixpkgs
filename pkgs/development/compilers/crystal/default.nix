@@ -37,7 +37,6 @@ let
   archs = {
     x86_64-linux = "linux-x86_64";
     i686-linux = "linux-i686";
-    x86_64-darwin = "darwin-universal";
     aarch64-darwin = "darwin-universal";
     aarch64-linux = "linux-aarch64";
   };
@@ -202,9 +201,8 @@ let
       env = {
         LLVM_CONFIG = "${llvmPackages.llvm.dev}/bin/llvm-config";
 
-        FLAGS = [
-          "--single-module" # needed for deterministic builds
-        ];
+        # needed for deterministic builds
+        FLAGS = "--single-module";
 
         # This makes sure we don't keep depending on the previous version of
         # crystal used to build this one.
@@ -290,7 +288,6 @@ rec {
     sha256s = {
       x86_64-linux = "sha256-F0LjdV02U9G6B8ApHxClF/o5KvhxMNukSX7Z2CwSNIs=";
       aarch64-darwin = "sha256-5kkObQl0VIO6zqQ8TYl0JzYyUmwfmPE9targpfwseSQ=";
-      x86_64-darwin = "sha256-5kkObQl0VIO6zqQ8TYl0JzYyUmwfmPE9targpfwseSQ=";
       aarch64-linux = "sha256-AzFz+nrU/HJmCL1hbCKXf5ej/uypqV1GJPVLQ4J3778=";
     };
   };

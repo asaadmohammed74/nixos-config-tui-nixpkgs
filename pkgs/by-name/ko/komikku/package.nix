@@ -24,14 +24,14 @@
 
 python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "komikku";
-  version = "1.102.0";
+  version = "50.9.0";
   pyproject = false;
 
   src = fetchFromCodeberg {
     owner = "valos";
     repo = "Komikku";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-wxGDy/cM9IBpgPNdun/P9f4447hJaaibBgIgLVaOirY=";
+    hash = "sha256-fjAls3/ikNrQ1AgwUe9hFoQ48zv7UbGCUNB4dlmYM28=";
   };
 
   nativeBuildInputs = [
@@ -62,6 +62,7 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     dateparser
     ebooklib
     emoji
+    jxlpy
     keyring
     lxml
     natsort

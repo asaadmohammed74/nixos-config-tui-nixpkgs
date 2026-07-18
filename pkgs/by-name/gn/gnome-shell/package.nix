@@ -56,7 +56,6 @@
   gnome-clocks,
   gnome-settings-daemon,
   gnome-autoar,
-  gnome-tecla,
   bash-completion,
   lcms2,
   libgbm,
@@ -74,7 +73,7 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "gnome-shell";
-  version = "49.3";
+  version = "50.2";
 
   outputs = [
     "out"
@@ -83,7 +82,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     url = "mirror://gnome/sources/gnome-shell/${lib.versions.major finalAttrs.version}/gnome-shell-${finalAttrs.version}.tar.xz";
-    hash = "sha256-KPDb1kRS8AVxKfImdTyV0nJt4H8fX0c63cfDxQem0xo=";
+    hash = "sha256-UyFUIOUO/dTQYRultZ4Qy0yJ+j9R4q3f2Vyt4GGgmik=";
   };
 
   patches = [
@@ -91,7 +90,6 @@ stdenv.mkDerivation (finalAttrs: {
     (replaceVars ./fix-paths.patch {
       glib_compile_schemas = "${glib.dev}/bin/glib-compile-schemas";
       gsettings = "${glib.bin}/bin/gsettings";
-      tecla = "${lib.getBin gnome-tecla}/bin/tecla";
       unzip = "${lib.getBin unzip}/bin/unzip";
     })
 
@@ -111,15 +109,6 @@ stdenv.mkDerivation (finalAttrs: {
     (fetchpatch {
       url = "https://src.fedoraproject.org/rpms/gnome-shell/raw/dcd112d9708954187e7490564c2229d82ba5326f/f/0001-gdm-Work-around-failing-fingerprint-auth.patch";
       hash = "sha256-mgXty5HhiwUO1UV3/eDgWtauQKM0cRFQ0U7uocST25s=";
-    })
-
-    # Fix crash when switching to hands-free mode on a bluetooth headset
-    (fetchpatch {
-      name = "fix-bluetooth-handsfree-crash.patch";
-      url = "https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/merge_requests/31.patch";
-      hash = "sha256-jFbItlXT05nnp825R/HvsWDFxAMzL4z36CsxhQ2sEIY=";
-      stripLen = 1;
-      extraPrefix = "subprojects/gvc/";
     })
   ];
 
